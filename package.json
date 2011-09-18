@@ -1,0 +1,17 @@
+{
+  "author": "Conner Petzold <cpetzold@gmail.com> (http://the0th.com)",
+  "name": "game",
+  "version": "0.0.0",
+  "repository": {
+    "url": ""
+  },
+  "engines": {
+    "node": "~v0.4.10"
+  },
+  "dependencies": {
+    "express": "2.x",
+    "jade": "0.15.x",
+    "impact": "0.1.x"
+  },
+  "devDependencies": {}
+}
