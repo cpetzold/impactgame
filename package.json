@@ -11,7 +11,9 @@
   "dependencies": {
     "express": "2.x",
     "jade": "0.15.x",
-    "impact": "0.1.x"
+    "socket.io": "0.8.x",
+    "impact": "0.1.x",
+    "logging": "2.x"
   },
   "devDependencies": {}
 }
