@@ -1,8 +1,9 @@
 var express = require('express')
-  , log = require('logging').from(__filename)
   , io = require('socket.io') 
   , impact = require('impact')
   , Game = require('./lib/game');
+
+console.log = require('logging');
 
 var server = express.createServer()
   , io = io.listen(server)
@@ -36,7 +37,7 @@ server.get('/wm', function(req, res) {
 });
 
 server.post('/create', function(req, res) {
-  log(req.body);
+  console.log(req.body);
   res.send(200);
 });
 
@@ -57,5 +58,5 @@ server.error(function(e, req, res) {
 });
 
 server.listen(8080, function() {
-  log('server started', server.address());
+  console.log('server started', server.address());
 });

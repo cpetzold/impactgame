@@ -4,6 +4,8 @@ ig.module(
 .requires(
     'impact.game'
   , 'impact.font'
+  
+  , 'game.entities.player'
 )
 .defines(function(){
 
@@ -14,18 +16,29 @@ MyGame = ig.Game.extend({
   init: function() {
     this.socket = io.connect(window.location.href);
     
+    this.players = {};
+    
     this.actions = {};
     this.bindActions({
         'left': ig.KEY.LEFT_ARROW
       , 'right': ig.KEY.RIGHT_ARROW
+      , 'up': ig.KEY.UP_ARROW
+      , 'down': ig.KEY.DOWN_ARROW
       , 'jump': ig.KEY.SPACE
       , 'esc': ig.KEY.ESCAPE
     });
+
+    this.join('cpetzold');
     
     this.socket.on('connection', $.proxy(this.onConnection, this));
-    this.socket.on('loadLevel', $.proxy(this.loadLevel, this));
+    this.socket.on('init', $.proxy(this.onInit, this));
+    this.socket.on('update', $.proxy(this.onUpdate, this));
     
     $(window).resize($.proxy(this.onResize, this));
+  },
+  
+  join: function(nickname) {
+    this.socket.emit('join', { nickname: nickname });
   },
   
   bindActions: function(mapping) {
@@ -36,8 +49,21 @@ MyGame = ig.Game.extend({
     });
   },
   
+  onInit: function(data) {
+    var self = this
+      , map = data.map
+      , players = data.state.players;
+
+    self.loadLevel(map);
+
+    Object.keys(players).forEach(function(nickname) {
+      var p = players[nickname];
+      self.players[nickname] = new Player(p.x, p.y);
+    });
+
+  },
+  
   onConnection: function(data) {
-    console.log('connection', data);
   },
   
   onResize: function() {
@@ -49,6 +75,18 @@ MyGame = ig.Game.extend({
       , w = w || $w.width()
       , h = h || $w.height();
     ig.system.resize(w, h);
+  },
+  
+  onUpdate: function(data) {
+    var self = this
+      , players = data.players;
+    
+    Object.keys(players).forEach(function(nickname) {
+      if (self.players[nickname]) {
+        self.players[nickname].update(players[nickname]);
+      }
+    });
+    
   },
   
   update: function() {
@@ -68,16 +106,20 @@ MyGame = ig.Game.extend({
     });
     
     if (actions.length) {
-      console.log(actions, self.actions);
       self.socket.emit('update', actions);
     }
     
   },
   
   draw: function() {
-    this.parent();
+    var self = this;
+    self.parent();
+
+    Object.keys(self.players).forEach(function(nickname) {
+      self.players[nickname].draw();
+    });
     
-    this.font.draw(ig.system.fps + ' FPS', 10, 10);
+    self.font.draw(ig.system.fps + ' FPS', 10, 10);
   },
   
 });

@@ -1,5 +1,5 @@
-lib/weltmeister
+public/lib/weltmeister
+public/lib/impact
 weltmeister.html
-lib/impact
 node_modules
 *.swp
