@@ -28,7 +28,8 @@ MyGame = ig.Game.extend({
       , 'esc': ig.KEY.ESCAPE
     });
 
-    this.join('cpetzold');
+    var nickname = prompt('Enter an alias');
+    this.join(nickname);
     
     this.socket.on('connection', $.proxy(this.onConnection, this));
     this.socket.on('init', $.proxy(this.onInit, this));
