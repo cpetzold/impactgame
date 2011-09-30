@@ -4,6 +4,7 @@ ig.module(
 .requires(
     'impact.game'
   , 'impact.font'
+  //, 'impact.debug.debug'
   
   , 'game.entities.player'
 )
@@ -30,8 +31,9 @@ MyGame = ig.Game.extend({
 
     var nickname = prompt('Enter an alias');
     this.join(nickname);
-    
+
     this.socket.on('connection', $.proxy(this.onConnection, this));
+    this.socket.on('disconnect', $.proxy(this.onDisconnect, this));
     this.socket.on('init', $.proxy(this.onInit, this));
     this.socket.on('update', $.proxy(this.onUpdate, this));
     
@@ -57,11 +59,28 @@ MyGame = ig.Game.extend({
 
     self.loadLevel(map);
 
-    Object.keys(players).forEach(function(nickname) {
-      var p = players[nickname];
-      self.players[nickname] = new Player(p.x, p.y);
+    self.backgroundMaps.forEach(function(bg) {
+      bg.preRender = true;
+      bg.debugChunks = true;
+      bg.chunkSize = 1024;
     });
 
+    console.log(self.collisionMap);
+
+    Object.keys(players).forEach(function(nickname) {
+      var p = players[nickname];
+      self.spawnEntity(Player, p.x, p.y, { name: nickname });
+    });
+
+    console.log(self.namedEntities);
+
+  },
+  
+  onDisconnect: function(data) {
+    var player = this.namedEntites[data.nickname];
+    if (player) {
+      player.kill();
+    }
   },
   
   onConnection: function(data) {
@@ -83,16 +102,22 @@ MyGame = ig.Game.extend({
       , players = data.players;
     
     Object.keys(players).forEach(function(nickname) {
-      if (self.players[nickname]) {
-        self.players[nickname].update(players[nickname]);
+      if (self.namedEntities[nickname]) {
+        self.namedEntities[nickname].update(players[nickname]);
       }
     });
+
+    //self.update();
+    //self.draw();
     
   },
   
+  //run: function() {
+  //  this.draw();
+  //},
+  
   update: function() {
     var self = this;
-    self.parent();
     
     var actions = [];
     Object.keys(self.actions).forEach(function(action) {
@@ -109,22 +134,16 @@ MyGame = ig.Game.extend({
     if (actions.length) {
       self.socket.emit('update', actions);
     }
-    
+
   },
   
   draw: function() {
     var self = this;
     self.parent();
-
-    Object.keys(self.players).forEach(function(nickname) {
-      self.players[nickname].draw();
-    });
-    
-    self.font.draw(ig.system.fps + ' FPS', 10, 10);
-  },
+  }
   
 });
 
-ig.main('#canvas', MyGame, 60, window.innerWidth, window.innerHeight);
+ig.main('#canvas', MyGame, 60, window.innerWidth, window.innerHeight, 2);
 
 });

@@ -6,6 +6,8 @@ ig.module('game.entities.entity').requires(
 Entity = ig.Entity.extend({
   collides: ig.Entity.COLLIDES.NEVER,
 
+  update: function() { }
+
 });
 
 });
