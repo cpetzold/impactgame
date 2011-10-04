@@ -11,7 +11,7 @@ var server = express.createServer()
 
 games['test'] = new Game(io, {
     room: 'test'
-  , map: 'map'
+  , map: 'test'
 });
 
 server.configure(function() {
