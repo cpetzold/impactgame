@@ -5,6 +5,7 @@ ig.module(
     'impact.game'
   , 'impact.font'
   //, 'impact.debug.debug'
+  , 'plugins.webgl-2d'
   
   , 'game.entities.player'
 )
